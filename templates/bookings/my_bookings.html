@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}My Bookings{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h1>My bookings</h1>
+            <a href="{% url 'home' %}" class="btn btn-secondary">Browse more events</a>
+        </div>
+
+        {% if bookings %}
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Event</th>
+                        <th>Date &amp; time</th>
+                        <th>Tickets</th>
+                        <th>Code</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for booking in bookings %}
+                    <tr>
+                        <td>
+                            <a href="{% url 'event_detail' booking.event.slug %}">{{ booking.event.title }}</a>
+                            <small>{{ booking.event.location }}</small>
+                        </td>
+                        <td>{{ booking.event.event_date|date:"M j, Y" }}<br>{{ booking.event.event_time|time:"g:i A" }}</td>
+                        <td>{{ booking.ticket_count }}</td>
+                        <td><code>{{ booking.confirmation_code }}</code></td>
+                        <td>
+                            <a href="{% url 'cancel_booking' booking.pk %}" class="btn btn-ghost btn-sm text-danger">Cancel</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>No bookings yet</h3>
+            <p>Explore events and reserve your first ticket today.</p>
+            <a href="{% url 'home' %}" class="btn btn-primary">Find events</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

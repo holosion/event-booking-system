@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h1>Staff dashboard</h1>
+        </div>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span class="stat-value">{{ booking_count }}</span>
+                <span class="stat-label">Confirmed bookings</span>
+            </div>
+            <div class="stat-card">
+                <span class="stat-value">{{ categories.count }}</span>
+                <span class="stat-label">Categories</span>
+            </div>
+        </div>
+        <div class="manage-actions">
+            <a href="{% url 'event_create' %}" class="btn btn-primary">+ New event</a>
+            <a href="{% url 'manage_events' %}" class="btn btn-secondary">All events</a>
+            <a href="{% url 'manage_categories' %}" class="btn btn-secondary">Categories</a>
+        </div>
+        <h2>Recent events</h2>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead>
+                    <tr><th>Title</th><th>Date</th><th>Capacity</th><th>Status</th></tr>
+                </thead>
+                <tbody>
+                    {% for event in events %}
+                    <tr>
+                        <td><a href="{% url 'event_update' event.slug %}">{{ event.title }}</a></td>
+                        <td>{{ event.event_date }}</td>
+                        <td>{{ event.tickets_sold }}/{{ event.capacity }}</td>
+                        <td>{% if event.is_published %}Published{% else %}Draft{% endif %}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4">No events yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

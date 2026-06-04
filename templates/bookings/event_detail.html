@@ -1,0 +1,57 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event.title }}{% endblock %}
+
+{% block content %}
+<section class="section section-detail">
+    <div class="container detail-grid">
+        <div class="detail-media">
+            {% with image_url=event.display_image_url %}
+            {% if image_url %}
+            <img src="{{ image_url }}" alt="{{ event.title }}" class="detail-image">
+            {% else %}
+            <div class="detail-placeholder" data-category="{{ event.category.name }}"></div>
+            {% endif %}
+            {% endwith %}
+        </div>
+        <div class="detail-info">
+            <span class="category-tag">{{ event.category.name }}</span>
+            <h1>{{ event.title }}</h1>
+            <ul class="detail-meta">
+                <li><strong>Date:</strong> {{ event.event_date|date:"l, F j, Y" }}</li>
+                <li><strong>Time:</strong> {{ event.event_time|time:"g:i A" }}</li>
+                <li><strong>Location:</strong> {{ event.location }}</li>
+                <li><strong>Capacity:</strong> {{ event.capacity }} seats</li>
+                <li><strong>Available:</strong>
+                    {% if event.is_full %}
+                    <span class="text-danger">Fully booked</span>
+                    {% else %}
+                    {{ event.seats_remaining }} remaining
+                    {% endif %}
+                </li>
+            </ul>
+            <div class="detail-description">
+                <h2>About this event</h2>
+                <p>{{ event.description|linebreaks }}</p>
+            </div>
+
+            <div class="detail-actions">
+                {% if user_booking %}
+                <div class="info-box">
+                    <p>You already booked <strong>{{ user_booking.ticket_count }}</strong> ticket(s).</p>
+                    <p>Confirmation: <code>{{ user_booking.confirmation_code }}</code></p>
+                    <a href="{% url 'my_bookings' %}" class="btn btn-secondary">View my bookings</a>
+                </div>
+                {% elif event.is_full %}
+                <button class="btn btn-disabled" disabled>Sold out</button>
+                {% elif user.is_authenticated %}
+                <a href="{% url 'book_event' event.slug %}" class="btn btn-primary btn-lg">Book tickets</a>
+                {% else %}
+                <p class="auth-hint">Please <a href="{% url 'login' %}?next={% url 'book_event' event.slug %}">log in</a> or <a href="{% url 'register' %}">sign up</a> to book.</p>
+                {% endif %}
+                <a href="{% url 'home' %}" class="btn btn-ghost">← Back to events</a>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,14 @@
+Hello {{ user.get_full_name|default:user.username }},
+
+Your booking is confirmed!
+
+Event: {{ event.title }}
+Date: {{ event.event_date }}
+Time: {{ event.event_time }}
+Location: {{ event.location }}
+Tickets: {{ booking.ticket_count }}
+Confirmation code: {{ booking.confirmation_code }}
+
+Please bring this code to the venue. To view or cancel your booking, log in to EventBook.
+
+Thank you for using EventBook!

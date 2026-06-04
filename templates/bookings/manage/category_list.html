@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+
+{% block title %}Categories{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container">
+        <div class="section-header">
+            <h1>Categories</h1>
+            <a href="{% url 'category_create' %}" class="btn btn-primary">+ Add category</a>
+        </div>
+        <div class="table-wrap">
+            <table class="data-table">
+                <thead><tr><th>Name</th><th>Description</th><th>Actions</th></tr></thead>
+                <tbody>
+                    {% for cat in categories %}
+                    <tr>
+                        <td>{{ cat.name }}</td>
+                        <td>{{ cat.description|truncatewords:12 }}</td>
+                        <td>
+                            <a href="{% url 'category_update' cat.pk %}">Edit</a>
+                            <a href="{% url 'category_delete' cat.pk %}" class="text-danger">Delete</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3">No categories.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</section>
+{% endblock %}

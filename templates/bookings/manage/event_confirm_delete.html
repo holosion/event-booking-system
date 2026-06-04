@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Event{% endblock %}
+
+{% block content %}
+<section class="section">
+    <div class="container narrow">
+        <div class="form-card">
+            <h1>Delete event?</h1>
+            <p>This will permanently remove <strong>{{ object.title }}</strong> and related data.</p>
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                    <a href="{% url 'manage_events' %}" class="btn btn-ghost">Cancel</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</section>
+{% endblock %}

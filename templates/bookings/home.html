@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}Browse Events{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="container hero-content">
+        <p class="hero-badge">Your next experience awaits</p>
+        <h1>Discover &amp; book amazing events</h1>
+        <p class="hero-sub">Concerts, workshops, meetups, and conferences — search by date or category and reserve your seat instantly.</p>
+    </div>
+    <div class="hero-glow"></div>
+</section>
+
+<section class="section">
+    <div class="container">
+        <form method="get" class="search-card" action="{% url 'home' %}">
+            <div class="search-grid">
+                <div class="field">
+                    <label for="id_q">Keyword</label>
+                    {{ search_form.q }}
+                </div>
+                <div class="field">
+                    <label for="id_category">Category</label>
+                    {{ search_form.category }}
+                </div>
+                <div class="field">
+                    <label for="id_event_date">Date</label>
+                    {{ search_form.event_date }}
+                </div>
+                <div class="field field-actions">
+                    <button type="submit" class="btn btn-primary">Search</button>
+                    <a href="{% url 'home' %}" class="btn btn-ghost">Clear</a>
+                </div>
+            </div>
+        </form>
+
+        <div class="section-header">
+            <h2>Upcoming events</h2>
+            <span class="badge">{{ featured_count }} found</span>
+        </div>
+
+        {% if events %}
+        <div class="event-grid">
+            {% for event in events %}
+            <article class="event-card {% if event.is_full %}event-card--full{% endif %}">
+                <div class="event-card-image">
+                    {% with image_url=event.display_image_url %}
+                    {% if image_url %}
+                    <img src="{{ image_url }}" alt="{{ event.title }}">
+                    {% else %}
+                    <div class="event-placeholder" data-category="{{ event.category.name }}"></div>
+                    {% endif %}
+                    {% endwith %}
+                    {% if event.is_full %}
+                    <span class="status-pill status-full">Sold Out</span>
+                    {% else %}
+                    <span class="status-pill status-open">{{ event.seats_remaining }} left</span>
+                    {% endif %}
+                </div>
+                <div class="event-card-body">
+                    <span class="category-tag">{{ event.category.name }}</span>
+                    <h3><a href="{% url 'event_detail' event.slug %}">{{ event.title }}</a></h3>
+                    <ul class="meta-list">
+                        <li>{{ event.event_date|date:"M j, Y" }} · {{ event.event_time|time:"g:i A" }}</li>
+                        <li>{{ event.location }}</li>
+                    </ul>
+                    <a href="{% url 'event_detail' event.slug %}" class="btn btn-secondary btn-block">
+                        {% if event.is_full %}View details{% else %}Book now{% endif %}
+                    </a>
+                </div>
+            </article>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <h3>No events match your search</h3>
+            <p>Try different filters or check back soon for new listings.</p>
+            <a href="{% url 'home' %}" class="btn btn-primary">View all events</a>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

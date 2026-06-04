@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign Up{% endblock %}
+
+{% block content %}
+<section class="section auth-section">
+    <div class="container narrow">
+        <div class="form-card">
+            <h1>Create your account</h1>
+            <p class="subtitle">Join EventBook and start booking in minutes.</p>
+            <form method="post" novalidate>
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="field {% if field.errors %}field-error{% endif %}">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.help_text %}<small class="help-text">{{ field.help_text }}</small>{% endif %}
+                    {% for error in field.errors %}<span class="error-text">{{ error }}</span>{% endfor %}
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary btn-block btn-lg">Sign up</button>
+            </form>
+            <p class="form-footer">Already have an account? <a href="{% url 'login' %}">Log in</a></p>
+        </div>
+    </div>
+</section>
+{% endblock %}
