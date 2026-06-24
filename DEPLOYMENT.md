@@ -1,56 +1,65 @@
 # Deployment Guide (Render)
 
-## Prerequisites
+## Why This Setup
 
-- GitHub repository: https://github.com/holosion/event-booking-system.git
-- [Render](https://render.com) account
+Render failed because the account already has one active free-tier PostgreSQL database. Render only allows one active free database per workspace, so this project now deploys without creating a database.
 
-## Option A: Blueprint (recommended)
+The app uses SQLite for the deadline-safe Render deployment. It will run, seed demo data, and show the full event catalog. For long-term production data, add PostgreSQL later and set `DATABASE_URL`.
 
-1. Push all project files to your GitHub repo.
-2. In Render: **New +** → **Blueprint** → connect `holosion/event-booking-system`.
-3. Render reads `render.yaml` and creates the web service + PostgreSQL database.
-4. Wait for the first deploy to finish (build runs `build.sh`: install, collectstatic, migrate, seed demo data).
-5. The seeded catalog includes 14 categories, 70 events, and static cover artwork from `static/img/events/`.
+## Blueprint Deployment
 
-## Option B: Manual web service
+1. Push all project files to GitHub.
+2. In Render, choose **New +** -> **Blueprint**.
+3. Connect `holosion/event-booking-system`.
+4. Render reads `render.yaml` and creates only the web service.
+5. Wait for the deploy to finish.
+
+The start command runs:
+
+```bash
+python manage.py migrate --no-input && python manage.py seed_demo_data && gunicorn eventbooking.wsgi:application
+```
+
+That creates the SQLite tables and loads 14 categories, 70 events, and cover artwork-backed event listings.
+
+## Manual Web Service Settings
 
 | Setting | Value |
-|---------|--------|
+| --- | --- |
 | Runtime | Python 3 |
-| Build Command | `./build.sh` |
-| Start Command | `gunicorn eventbooking.wsgi:application` |
+| Build Command | `bash build.sh` |
+| Start Command | `python manage.py migrate --no-input && python manage.py seed_demo_data && gunicorn eventbooking.wsgi:application` |
 
 Add environment variables:
 
 | Variable | Value |
-|----------|--------|
+| --- | --- |
 | `DEBUG` | `False` |
-| `DJANGO_SECRET_KEY` | (generate secure random string) |
-| `DATABASE_URL` | (from Render PostgreSQL instance) |
+| `DJANGO_SECRET_KEY` | Generate a secure random string |
 | `PYTHON_VERSION` | `3.12.3` |
+| `ALLOWED_HOSTS` | Your Render hostname |
 
-## After deployment
+Do not add `DATABASE_URL` unless you have a PostgreSQL database available.
 
-1. Copy your live URL (e.g. `https://event-booking-system-xxxx.onrender.com`).
+## After Deployment
+
+1. Copy your live URL, for example `https://event-booking-system-xxxx.onrender.com`.
 2. Add it to your project report and submission.
-3. Log in with demo staff: `staff` / `StaffDemo123!` (created by `seed_demo_data` on build).
+3. Log in with demo staff: `staff` / `StaffDemo123!`.
 
-## Email on production
+## Email on Production
 
-Set SMTP variables in Render:
+Set SMTP variables in Render if you want real email sending:
 
 - `EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend`
-- `EMAIL_HOST`, `EMAIL_PORT`, `EMAIL_HOST_USER`, `EMAIL_HOST_PASSWORD`
+- `EMAIL_HOST`
+- `EMAIL_PORT`
+- `EMAIL_HOST_USER`
+- `EMAIL_HOST_PASSWORD`
 - `DEFAULT_FROM_EMAIL`
 
-Without these, bookings still work; confirmation codes appear in the success message.
+Without these, bookings still work; confirmation codes appear in the success message or console.
 
-## Demo event images
+## Demo Event Images
 
-The seeded event images are stored as static files instead of uploaded media. This keeps the demo catalog reliable on Render's ephemeral filesystem and lets WhiteNoise serve the covers after `collectstatic`.
-
-## Local vs production database
-
-- **Local:** SQLite (`db.sqlite3`)
-- **Render:** PostgreSQL via `DATABASE_URL` (persistent, recommended)
+The seeded event images are stored as static files instead of uploaded media. This keeps the demo catalog reliable on Render and lets WhiteNoise serve the covers after `collectstatic`.
